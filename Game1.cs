@@ -1,6 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MLEM.Ui;
+using MLEM.Ui.Style;
+using MLEM.Ui.Elements;
+using MLEM.Font;
 
 namespace templatetest;
 
@@ -8,6 +12,7 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+    public UiSystem UiSystem;
 
     public Game1()
     {
@@ -26,6 +31,17 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        var style = new UntexturedStyle(this._spriteBatch);
+        style.Font = new GenericSpriteFont(this.Content.Load<SpriteFont>("Fonts/DroidSans"), this.Content.Load<SpriteFont>("Fonts/DroidSans-Bold"));
+        this.UiSystem = new UiSystem(this, style, null);
+
+        var box = new Panel(Anchor.Center, new Vector2(100, 1), Vector2.Zero, setHeightBasedOnChildren: true);
+        box.AddChild(new Paragraph(Anchor.AutoLeft, 1, "This is some example text!"));
+        box.AddChild(new Button(Anchor.AutoCenter, new Vector2(0.5F, 20), "Okay") {
+            OnPressed = element => this.UiSystem.Remove("InfoBox"),
+            PositionOffset = new Vector2(0, 1)
+        });
+        this.UiSystem.Add("InfoBox", box);
 
         // TODO: use this.Content to load your game content here
     }
@@ -37,6 +53,8 @@ public class Game1 : Game
 
         // TODO: Add your update logic here
 
+        this.UiSystem.Update(gameTime);
+
         base.Update(gameTime);
     }
 
@@ -46,6 +64,7 @@ public class Game1 : Game
 
         // TODO: Add your drawing code here
 
+        this.UiSystem.Draw(gameTime, this._spriteBatch);
         base.Draw(gameTime);
     }
 }
