@@ -5,6 +5,7 @@ using MLEM.Ui;
 using MLEM.Ui.Style;
 using MLEM.Ui.Elements;
 using MLEM.Font;
+using MLEM.Misc;
 
 namespace templatetest;
 
@@ -19,6 +20,8 @@ public class Game1 : Game
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        Window.AllowUserResizing = true;
+        //graphics.IsFullScreen = true;
     }
 
     protected override void Initialize()
@@ -33,11 +36,12 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         var style = new UntexturedStyle(this._spriteBatch);
         style.Font = new GenericSpriteFont(this.Content.Load<SpriteFont>("Fonts/DroidSans"), this.Content.Load<SpriteFont>("Fonts/DroidSans-Bold"));
+        style.PanelChildPadding = new Padding(style.PanelChildPadding, 10);
         this.UiSystem = new UiSystem(this, style, null);
 
-        var box = new Panel(Anchor.Center, new Vector2(100, 1), Vector2.Zero, setHeightBasedOnChildren: true);
+        var box = new Panel(Anchor.Center, new Vector2(400, 1), Vector2.Zero, setHeightBasedOnChildren: true);
         box.AddChild(new Paragraph(Anchor.AutoLeft, 1, "This is some example text!"));
-        box.AddChild(new Button(Anchor.AutoCenter, new Vector2(0.5F, 20), "Okay") {
+        box.AddChild(new Button(Anchor.AutoCenter, new Vector2(0.5F, 80), "Okay") {
             OnPressed = element => this.UiSystem.Remove("InfoBox"),
             PositionOffset = new Vector2(0, 1)
         });
