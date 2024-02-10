@@ -27,6 +27,12 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/DroidSans.spritefont
 
+#begin Shaders/Invert.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Invert.fx
+
 #begin Textures/pexels-sherman-trotz-18896623.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
