@@ -15,6 +15,8 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     public UiSystem UiSystem;
 
+    Texture2D background;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -47,6 +49,8 @@ public class Game1 : Game
         });
         this.UiSystem.Add("InfoBox", box);
 
+        this.background = Content.Load<Texture2D>("Textures/pexels-sherman-trotz-18896623");
+
         // TODO: use this.Content to load your game content here
     }
 
@@ -67,6 +71,10 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+
+        this._spriteBatch.Begin();
+        this._spriteBatch.Draw(this.background, Vector2.Zero, Color.White);
+        this._spriteBatch.End();
 
         this.UiSystem.Draw(gameTime, this._spriteBatch);
         base.Draw(gameTime);
