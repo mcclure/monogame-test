@@ -19,7 +19,10 @@ struct VertexShaderOutput
 
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
-	return SpriteTexture.Sample(SpriteTextureSampler,input.TextureCoordinates) * input.Color;
+	float4 read = SpriteTexture.Sample(SpriteTextureSampler,input.TextureCoordinates);
+	return float4(
+		1.0f - read.rgb * input.Color.rgb,
+		read.a);
 }
 
 technique SpriteDrawing
