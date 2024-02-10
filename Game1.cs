@@ -16,12 +16,14 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     public UiSystem UiSystem;
     public float bgScale = 1.0f, bgRot = 0.0f;
+    Effect effect;
 
     Texture2D background;
 
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
+        effect = Content.Load<Effect>("Shaders/Invert");
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
@@ -86,7 +88,8 @@ public class Game1 : Game
 
         // TODO: Add your drawing code here
 
-        this._spriteBatch.Begin();
+        this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+        effect.CurrentTechnique.Passes[0].Apply(); // Apply shader
         this._spriteBatch.Draw(this.background, new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
         this._spriteBatch.End();
 
