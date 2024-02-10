@@ -23,7 +23,7 @@ public class Game1 : Game
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
-        effect = Content.Load<Effect>("Shaders/Invert");
+        Console.WriteLine(_graphics);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
@@ -40,6 +40,8 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        effect = Content.Load<Effect>("Shaders/Invert");
+
         var style = new UntexturedStyle(this._spriteBatch);
         style.Font = new GenericSpriteFont(this.Content.Load<SpriteFont>("Fonts/DroidSans"), this.Content.Load<SpriteFont>("Fonts/DroidSans-Bold"));
         style.PanelChildPadding = new Padding(style.PanelChildPadding, 10);
