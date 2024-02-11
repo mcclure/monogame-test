@@ -17,7 +17,8 @@ public class Game1 : Game
     public UiSystem UiSystem;
     public float bgScale = 1.0f, bgRot = 0.0f;
     Effect effect;
-    RenderTarget2D renderTarget = null;
+    RenderTarget2D[] renderTarget = new RenderTarget2D[2];
+    int renderCurrent = 0;
 
     Texture2D background;
 
@@ -42,22 +43,23 @@ public class Game1 : Game
 
     public void OnResize(Object sender, EventArgs e) {
         Console.WriteLine("RESIZE " + GraphicsDevice.PresentationParameters.BackBufferWidth + ", " + GraphicsDevice.PresentationParameters.BackBufferHeight);
-        if (renderTarget != null)
-            renderTarget.Dispose();
-        renderTarget = new RenderTarget2D(
-                GraphicsDevice,
-                GraphicsDevice.PresentationParameters.BackBufferWidth,
-                GraphicsDevice.PresentationParameters.BackBufferHeight,
-                false,
-                GraphicsDevice.PresentationParameters.BackBufferFormat,
-                DepthFormat.Depth24);
-
-        GraphicsDevice.SetRenderTarget(renderTarget);
-        GraphicsDevice.Clear(Color.CornflowerBlue);
-                this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-        this._spriteBatch.Draw(this.background, new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
-        this._spriteBatch.End();
-        GraphicsDevice.SetRenderTarget(null);
+        renderCurrent = 0;
+        for(int idx = 0; idx < 2; idx++) {
+            if (renderTarget[idx] != null)
+                renderTarget[idx].Dispose();
+            renderTarget[idx] = new RenderTarget2D(
+                    GraphicsDevice,
+                    GraphicsDevice.PresentationParameters.BackBufferWidth,
+                    GraphicsDevice.PresentationParameters.BackBufferHeight,
+                    false,
+                    GraphicsDevice.PresentationParameters.BackBufferFormat,
+                    DepthFormat.Depth24);
+            GraphicsDevice.SetRenderTarget(renderTarget[idx]);
+            {
+                GraphicsDevice.Clear(Color.Green);
+            }
+            GraphicsDevice.SetRenderTarget(null);
+        }
     }
 
     protected override void LoadContent()
@@ -109,16 +111,27 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Red);
+        int renderNext = 1-renderCurrent;
+        GraphicsDevice.SetRenderTarget(renderTarget[renderCurrent]);
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+            // TODO: Add your drawing code here
+
+            this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            effect.CurrentTechnique.Passes[0].Apply(); // Apply shader
+            this._spriteBatch.Draw(renderTarget[1-renderCurrent], new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
+            this._spriteBatch.End();
+
+            this.UiSystem.Draw(gameTime, this._spriteBatch);
+            base.Draw(gameTime);
+        }
+        GraphicsDevice.SetRenderTarget(null);
 
         this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-        effect.CurrentTechnique.Passes[0].Apply(); // Apply shader
-        this._spriteBatch.Draw(renderTarget, new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
+        this._spriteBatch.Draw(renderTarget[renderCurrent], Vector2.Zero, Color.White);
         this._spriteBatch.End();
 
-        this.UiSystem.Draw(gameTime, this._spriteBatch);
-        base.Draw(gameTime);
+        renderCurrent = renderNext;
     }
 }
