@@ -22,6 +22,9 @@ public class Game1 : Game
 
     Texture2D background;
 
+    private MouseState ms = new MouseState(), oms;
+    private Point centerAt = Point.Zero;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -102,6 +105,15 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        oms = ms;
+        ms = Mouse.GetState();
+        bool leftDown = ms.LeftButton == ButtonState.Pressed;
+        bool leftEdge = leftDown && oms.LeftButton != ButtonState.Pressed;
+        if (leftDown && !leftEdge) {
+            Point offset = new Point(ms.X - oms.X, ms.Y - oms.Y);
+            centerAt += offset;
+        }
+
         // TODO: Add your update logic here
 
         this.UiSystem.Update(gameTime);
@@ -120,13 +132,15 @@ public class Game1 : Game
 
             this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
             effect.CurrentTechnique.Passes[0].Apply(); // Apply shader
-            this._spriteBatch.Draw(renderTarget[1-renderCurrent], new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
+            this._spriteBatch.Draw(renderTarget[1-renderCurrent], new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center + centerAt, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
             this._spriteBatch.End();
 
             this.UiSystem.Draw(gameTime, this._spriteBatch);
             base.Draw(gameTime);
         }
         GraphicsDevice.SetRenderTarget(null);
+
+        GraphicsDevice.Clear(Color.Red);
 
         this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
         this._spriteBatch.Draw(renderTarget[renderCurrent], Vector2.Zero, Color.White);
