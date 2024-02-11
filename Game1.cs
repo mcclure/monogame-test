@@ -17,6 +17,7 @@ public class Game1 : Game
     public UiSystem UiSystem;
     public float bgScale = 1.0f, bgRot = 0.0f;
     Effect effect;
+    RenderTarget2D renderTarget = null;
 
     Texture2D background;
 
@@ -27,6 +28,7 @@ public class Game1 : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
+        Window.ClientSizeChanged += OnResize;
         //graphics.IsFullScreen = true;
     }
 
@@ -35,6 +37,27 @@ public class Game1 : Game
         // TODO: Add your initialization logic here
 
         base.Initialize();
+        OnResize(null, null);
+    }
+
+    public void OnResize(Object sender, EventArgs e) {
+        Console.WriteLine("RESIZE " + GraphicsDevice.PresentationParameters.BackBufferWidth + ", " + GraphicsDevice.PresentationParameters.BackBufferHeight);
+        if (renderTarget != null)
+            renderTarget.Dispose();
+        renderTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.PresentationParameters.BackBufferWidth,
+                GraphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                GraphicsDevice.PresentationParameters.BackBufferFormat,
+                DepthFormat.Depth24);
+
+        GraphicsDevice.SetRenderTarget(renderTarget);
+        GraphicsDevice.Clear(Color.CornflowerBlue);
+                this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+        this._spriteBatch.Draw(this.background, new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
+        this._spriteBatch.End();
+        GraphicsDevice.SetRenderTarget(null);
     }
 
     protected override void LoadContent()
@@ -86,13 +109,13 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(Color.Red);
 
         // TODO: Add your drawing code here
 
         this._spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
         effect.CurrentTechnique.Passes[0].Apply(); // Apply shader
-        this._spriteBatch.Draw(this.background, new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
+        this._spriteBatch.Draw(renderTarget, new Rectangle(GraphicsDevice.PresentationParameters.Bounds.Center, new Point((int)(bgScale*this.background.Width), (int)(bgScale*this.background.Height))), null, Color.White, bgRot, new Vector2(this.background.Width/2.0f, this.background.Height/2.0f), SpriteEffects.None, 0.0f);
         this._spriteBatch.End();
 
         this.UiSystem.Draw(gameTime, this._spriteBatch);
